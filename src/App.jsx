@@ -1,55 +1,121 @@
-function App(){
-   return (
-    <div className="container text-center">
-      <div className="row">
-        <div className="col">
-      <h1>Shoppin List</h1>
-      <hr />
-      </div>
-      </div>
-      <div className="row">
-        <div className="col-1">
-          <input type="checkbox" />
-      </div>
-      <div className="col text-start">
-      1 kg
-      </div>
-        <div className="col-5 col-md-7 text-start ">
-          Tortillas
-      </div>
-      <div className="col-4 col-md-3 btn-group btn-group-sm">
-        <button className="btn btn-outline-primary">
-        < i className="bi bi-pencil-square"></i>
-        </button>
-        <button className="btn btn-outline-danger">
-          <i className="bi bi-trash2-fill"></i>
-        </button>
-      </div>
-    </div>
+import { useState } from "react"
+import ListItem from "./Components/Listitem";
+import NewListItemButtom from "./Components/NewListitemButton";
+import ClearListButton from "./Components/ClearListButton";
+import Swal from "sweetalert2";
 
+function App() {
+  const [listItems, setListItems] = useState([
+    {
+      id:"1",
+      name:"Tortillas",
+      quantity:"2",
+      unit:"kg",
+      checked:false
+    },
+    {
+      id:"2",
+      name:"Aceite",
+      quantity:"900",
+      unit:"ml",
+      checked:false
+    },
+  ]);
+
+  const handleNewListItemButtom = async () =>{
+    const {value} = await Swal.fire({
+      title:"New Item Information",
+      html:`<input 
+            type="text" 
+            id="name" 
+            name="name" 
+            class="swal2-input" 
+            placeholder="Item"
+            />
+            <input 
+            type="number" 
+            id="quantity" 
+            name="quantity" 
+            class="swal2-input" 
+            placeholder="Qty"
+            />
+            <input 
+            type="text" 
+            id="unit" 
+            name="unit" 
+            class="swal2-input" 
+            placeholder="Unit"
+            />`,
+      confirmButtonText:"Add item",
+      showCloseButton: true,
+      showCancelButton: true,
+      focusConfirm: false,
+      cancelButtonText: "Dismiss",
+      preConfirm: () =>{
+        const name= Swal.getPopup().querySelector('#name').value;
+        const quantity= Swal.getPopup().querySelector('#quantity').value;
+        const unit= Swal.getPopup().querySelector('#unit').value;
+
+        if (!name|| !quantity || !unit) {
+          Swal.showValidationMessage('Please enter the item full information');
+        }
+        return{name, quantity, unit}
+      },
+    })
+
+    if(!value.name || !value.quantity || !value.unit) return
+
+    setListItems([
+      ...listItems,
+      {id: (listItems.length + 1).toString(), ...value, checked:false},
+    ]);
+
+    console.log({value});
+  }
+
+
+  const handleCheckboxChange = (e) =>{
+    const newList = listItems.map(item => {
+      if(item.id === e.target.name){
+        item.checked = !item.checked;
+      }
+      return item
+    })
+    setListItems(newList);
+  };
+
+return(
+  <div className="container text-center">
     <div className="row">
-        <div className="col-1">
-          <input type="checkbox" />
+      <div className="col-2"></div>
+      <div className="col">
+       <h1>Shopping List</h1>
       </div>
-      <div className="col text-start">
-      1 lt
-      </div>
-        <div className="col-5 col-md-7 text-start">
-          Aceite
-      </div>
-      <div className="col-4 col-md-3 btn-group btn-group-sm text-end">
-        <button className="btn btn-outline-primary">
-        < i className="bi bi-pencil-square"></i>
-        </button>
-        <button className="btn btn-outline-danger">
-          <i className="bi bi-trash2-fill"></i>
-        </button>
+       <div className="col-2 text-end">
+          <ClearListButton setListItems={setListItems}/>
+          <NewListItemButtom handleButtom={handleNewListItemButtom} />
+       </div>
+    </div>
+    <hr />
+    {
+      listItems.map((listItem)=>(
+        <ListItem
+        item={listItem}
+        listItems={listItems}
+        setListItems={setListItems}
+        handleCheckboxChange={handleCheckboxChange}
+        />
+      ))
+    }
+    <hr />
+    <div className="row">
+      <div className="col text-end">
+      <ClearListButton setListItems={setListItems}/>
+      <NewListItemButtom handleButtom={handleNewListItemButtom} />
       </div>
     </div>
-
-
-  </div> 
-   )
+  </div>
+)
 }
 
 export default App
