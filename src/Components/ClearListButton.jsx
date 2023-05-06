@@ -1,6 +1,7 @@
 
 import Swal from "sweetalert2"
 
+
 const ClearListButton = ({setListItems}) => {
 
     const clearList = async () =>{
@@ -13,6 +14,8 @@ const ClearListButton = ({setListItems}) => {
         });
 
         if(result.isConfirmed){
+            localStorage.setItem("listItems",
+            JSON.stringify([]))
             setListItems([]);
         }
     }
